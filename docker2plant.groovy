@@ -42,15 +42,15 @@ println '''
 
 skinparam monochrome true
 '''
-compose.forEach { containerName, container ->
-  container.links?.forEach {
+compose.each { containerName, container ->
+  container.links?.each {
     def (linkName, linkAlias) = it.tokenize(':')
     if (!(linkName in ignoredContainers)) {
       def aliasRepresentaion = linkAlias ? "\"$linkAlias\" " : ''
       println "[$containerName] --> $aliasRepresentaion[$linkName]"
     }
   }
-  container.volumes_from?.findAll { !(it in ignoredContainers) }?.forEach {
+  container.volumes_from?.findAll { !(it in ignoredContainers) }?.each {
     println "[$containerName] ..> [$it]"
   }
 }
