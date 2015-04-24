@@ -17,13 +17,16 @@
  */
 
 @Grab('org.yaml:snakeyaml:1.15')
+@Grab('net.sourceforge.plantuml:plantuml:8022')
 
 import org.yaml.snakeyaml.Yaml
+import net.sourceforge.plantuml.code.TranscoderUtil
 
 def cli = new CliBuilder(usage: 'docker2plant.groovy [options] [docker_compose_file]')
 //Can't use Option.UNLIMITED_VALUES with a comma separator since the docker_compose_file argument is consumed by this option
 cli.i(longOpt: 'ignore', args: 1, argName: 'container',
       'To specify a container to be ignored. To sepcify multiple containers just specify the option multiple times')
+cli.o(longOpt: 'output', args: 1, argName: 'outputType', 'Specify the type of output to generate. Available options: txt, url. Defaults to txt.')
 cli.h(longOpt: 'help', 'Displays this help')
 def options = cli.parse(args)
 
@@ -34,30 +37,46 @@ if (options.h) {
 def ignoredContainers = options.is
 def arguments = options.arguments()
 def composeFile = arguments ? new File(arguments[0]) : new File('docker-compose.yml')
+def outputType = options.o ?: 'txt'
 Yaml yaml = new Yaml()
 def compose = yaml.load(new FileInputStream(composeFile))
 
-println '''
+StringBuilder sb = new StringBuilder();
+sb.append('''
 @startuml
 
 skinparam monochrome true
-'''
+
+''')
 compose.each { containerName, container ->
   container.links?.each {
     def (linkName, linkAlias) = it.tokenize(':')
     if (!(linkName in ignoredContainers)) {
       def aliasRepresentaion = linkAlias ? "\"$linkAlias\" " : ''
-      println "[$containerName] --> $aliasRepresentaion[$linkName]"
+      sb.append("[$containerName] --> $aliasRepresentaion[$linkName]\n")
     }
   }
   container.volumes_from?.findAll { !(it in ignoredContainers) }?.each {
-    println "[$containerName] ..> [$it]"
+    sb.append("[$containerName] ..> [$it]\n")
   }
 }
-println '''
+sb.append('''
 legend left
 - Dotted arrows represent dependencies through volumes
 endlegend
 
 @enduml
-'''
+''')
+switch (outputType) {
+  case 'txt':
+    println sb.toString();
+    break;
+  case 'url':
+    println 'http://www.planttext.com/planttext?text=' + TranscoderUtil.getDefaultTranscoder().encode(sb.toString())
+    break;
+  default:
+    println "Invalid output type '$outputType' specified"
+    cli.usage();
+    System.exit(1);
+    return;
+}

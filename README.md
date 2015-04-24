@@ -4,7 +4,7 @@ Script used to create [plantUml] component diagrams from `docker-compose.yml` fi
 
 ##Preconditions
 - [groovy](http://www.groovy-lang.org/)
-- [maven](https://maven.apache.org/) configured to be able to download dependencies (in particular we need [snakeyaml](http://www.snakeyaml.org)) 
+- [maven](https://maven.apache.org/) configured to be able to download dependencies. 
 
 ##Installation
 
@@ -60,6 +60,8 @@ endlegend
 ```
 
 You can use [planttext](http://www.planttext.com/) to visualize, editor or get a png of the diagram.
+
+Additionally you can use `-o url` option to just generate the URL.
 
 
 [plantUml]:http://plantuml.com
