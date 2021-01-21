@@ -1,21 +1,21 @@
-#docker2plant
+# docker2plant
 
 Script used to create [plantUml] component diagrams from `docker-compose.yml` files using `links` and `volumes_from` properties.
 
-##Preconditions
+## Preconditions
 - [groovy](http://www.groovy-lang.org/)
 - [maven](https://maven.apache.org/) configured to be able to download dependencies. 
 
-##Installation
+## Installation
 
 Just add it to your `/usr/local/bin` folder if you want it to be available from any path. 
 Another option is just downloading the script and run it with the proper path of the `docker-compose.yml` file as parameter.
 
-##Example of usage
+## Example of usage
 
 with a `docker-compose.yml` like this one:
 
-```
+```yaml
 app:
   ...
   links:
